@@ -35,6 +35,11 @@ int main(int argc, char** argv)
     while(s != "quit")
     {
         getline(cin, s);
+        
+        if(s.substr(0,3) == "let")
+        {
+            cout << "let" << endl;
+        }
             
         Expression parser(s);
         

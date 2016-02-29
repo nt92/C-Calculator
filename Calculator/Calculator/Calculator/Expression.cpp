@@ -156,7 +156,7 @@ void Expression::Tokenize(list<string>& tokens, const string& delimiter)
             }
         }
         
-        else if(token == "-" && (IsOperator(prevToken) || prevToken == "^" || prevToken == "%"))
+        else if(token == "-" && (IsOperator(prevToken) || prevToken == "^"))
         {
             if(token == "-" && prevToken == "-")
             {
