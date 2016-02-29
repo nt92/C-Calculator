@@ -52,6 +52,14 @@ bool IsNumber(const string& s)
     return !s.empty() && it == s.end();
 }
 
+bool IsVariable(const string& s)
+{
+    if(s != "quit" && s != "let" && !IsOperator(s) && !IsNumber(s))
+        return true;
+    
+    return false;
+}
+
 void replaceAll(string& str, const string& from, const string& to)
 {
     size_t start_pos = 0;
@@ -226,7 +234,7 @@ bool infixToPostfix(string& in, vector<string>& out)
     {
         string token = *it;
         
-        if(IsNumber(token))
+        if(IsNumber(token) || IsVariable(token))
             outputQueue.push(token);
         
         else if(IsOperator(token))
@@ -286,7 +294,7 @@ bool infixToPostfix(string& in, vector<string>& out)
 
 int main()
 {
-    string infix = "1+1";
+    string infix = "1+1*ans";
     
     vector<string> postfix;
     
