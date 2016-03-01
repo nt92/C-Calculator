@@ -42,19 +42,6 @@ bool IsOperator(const string& s)
     return s == "+" || s == "-" || s == "/" || s == "*" || s == "^";
 }
 
-string ToUpper(string input)
-{
-    for(string::iterator it = input.begin();
-        it != input.end();
-        ++it)
-    {
-        *it = toupper(*it);
-    }
-    
-    return input;
-}
-
-
 bool IsNumber(const string& s)
 {
     string::const_iterator it = s.begin();
@@ -265,7 +252,7 @@ bool Expression::Evaluate(const vector<string>& rpn, string& result)
         {
             double result = 0.0;
             
-            unsigned int numArgs = OpArgCount(ToUpper(token));
+            unsigned int numArgs = OpArgCount(token);
             
             bool isUnary = false;
             unsigned long stackArgs = stack.size();
@@ -311,7 +298,14 @@ bool Expression::Evaluate(const vector<string>& rpn, string& result)
                     result = d1 * d2;
                 
                 else if(token == "/")
+                {
+                    if(d2 == 0)
+                    {
+                        cout << "Divide by zero" << endl;
+                        return false;
+                    }
                     result = d1 / d2;
+                }
                 
                 else if(token == "^")
                 {

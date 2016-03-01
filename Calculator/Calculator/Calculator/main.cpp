@@ -37,8 +37,6 @@ int main(int argc, char** argv)
             parser.Evaluate(postfixEval, str_result);
             double result = string_to_double(str_result);
             
-            cout << postfix[0] << " " << result;
-            
             parser.hash.put(postfix[0], result);
         }
             
@@ -54,9 +52,7 @@ int main(int argc, char** argv)
             if (parser.Evaluate(postfix, str_result))
             {
                 double result = string_to_double(str_result);
-                cout << "\n" << result;
-                    
-                cout << endl;
+                cout << result << endl;
             }
         }
         
