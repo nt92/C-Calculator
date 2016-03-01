@@ -242,6 +242,20 @@ bool Expression::Evaluate(const vector<string>& rpn, string& result)
     {
         string token = *it;
         
+        if(IsVariable(token))
+        {
+            string temp = hash.get(token);
+            if(temp != "NA")
+            {
+                token = temp;
+            }
+            else
+            {
+                cout << "Not a variable" << endl;
+                return false;
+            }
+        }
+        
         if(IsNumber(token))
         {
             stack.push(token);
