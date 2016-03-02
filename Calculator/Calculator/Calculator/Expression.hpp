@@ -45,7 +45,7 @@ public:
     void printMap(){
         for(auto it = hashMap.begin(); it != hashMap.end(); ++it)
         {
-            cout << " " << it -> first << ": " << it->second << endl;
+            cout << " " << it -> first << " : " << it->second << endl;
         }
     }
 };

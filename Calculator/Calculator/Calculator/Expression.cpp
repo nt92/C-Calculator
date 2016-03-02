@@ -44,13 +44,14 @@ bool IsOperator(const string& s)
 
 bool IsNumber(const string& s)
 {
-    string::const_iterator it = s.begin();
-    while(it != s.end() && isdigit(*it, locale()))
-    {
-        ++it;
-    }
-    
-    return !s.empty() && it == s.end();
+//    string::const_iterator it = s.begin();
+//    while(it != s.end() && isdigit(*it, locale()))
+//    {
+//        ++it;
+//    }
+//    
+//    return !s.empty() && it == s.end();
+    return (strspn( s.c_str(), "-.0123456789" ) == s.size());
 }
 
 bool IsVariable(const string& s)
@@ -238,7 +239,7 @@ bool Expression::Evaluate(const vector<string>& rpn, string& result)
             }
             else
             {
-                cout << "Not a variable" << endl;
+                cout << "Undeclared-Variable" << endl;
                 return false;
             }
         }
@@ -301,7 +302,7 @@ bool Expression::Evaluate(const vector<string>& rpn, string& result)
                 {
                     if(d2 == 0)
                     {
-                        cout << "Divide by zero" << endl;
+                        cout << "Divide-By-Zero" << endl;
                         return false;
                     }
                     result = d1 / d2;
