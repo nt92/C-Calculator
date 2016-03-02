@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 //            {
 //                cout << postfix[i] << " ";
 //            }
-            
+//            
             string str_result;
                 
             if (parser.Evaluate(postfix, str_result))
