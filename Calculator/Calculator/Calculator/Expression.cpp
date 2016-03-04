@@ -1,5 +1,6 @@
 #include "Expression.hpp"
 
+//charset to define which characters will be used for operators as well as parenthesis
 const string charSet[] = { "(", ")", "+", "-", "*", "/", "^" };
 
 Expression::Expression(const string& input)
@@ -9,6 +10,7 @@ Expression::Expression(const string& input)
 
 int OpArgCount(const string& s)
 {
+    //returns the number of arguments needed for a specific operation
     if(s == "+" || s == "-" || s == "*" || s == "/" || s == "^")
         return 2;
     
@@ -17,6 +19,7 @@ int OpArgCount(const string& s)
 
 int OperatorPrecedence(const string& s)
 {
+    //basic precedence. ^ > * or / > + or -. else it's a var/number and it's 0
     if(s == "^")
         return 3;
     
@@ -31,6 +34,7 @@ int OperatorPrecedence(const string& s)
 
 bool LeftAssociative(const string& s)
 {
+    //Is left associative if the token is one of these operators
     if(s == "*" || s == "/" || s == "+" || s == "-")
         return true;
     
@@ -39,11 +43,13 @@ bool LeftAssociative(const string& s)
 
 bool IsOperator(const string& s)
 {
+    //returns true if the token is one of these operators
     return s == "+" || s == "-" || s == "/" || s == "*" || s == "^";
 }
 
 bool IsNumber(const string& s)
 {
+    //Old code to check if number was an integer
 //    string::const_iterator it = s.begin();
 //    while(it != s.end() && isdigit(*it, locale()))
 //    {
@@ -51,11 +57,14 @@ bool IsNumber(const string& s)
 //    }
 //    
 //    return !s.empty() && it == s.end();
+    
+    //new code to accommdate doubles. Checks if string has any only the given characters and if so, it's a number. integer or double
     return (strspn( s.c_str(), ".0123456789" ) == s.size());
 }
 
 bool IsVariable(const string& s)
 {
+    //if the token is not equal to a hardcoded number: quit or let, if it's not an operator or a number, and if it's not a parenthesis, it is a variable by definition.
     if(s != "quit" && s != "let" && !IsOperator(s) && !IsNumber(s) && s != "(" && s != ")")
         return true;
     
