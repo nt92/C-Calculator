@@ -16,11 +16,13 @@
 
 using namespace std;
 
+//hashmap using unordered_map that is easier to use. employs basic get, put, and printmap method for testing
 class HashMap
 {
     unordered_map<string, double> hashMap;
     
 public:
+    //put method either adds to hashmap if not already existing, or updates if the corresponding key exists
     void put(string key, double value) {
         if (get(key) == "NA") {
             hashMap.insert({key,value});
@@ -42,6 +44,7 @@ public:
         }
     }
     
+    //uses hashmap iterator to iterate and output each key-value pair
     void printMap(){
         for(auto it = hashMap.begin(); it != hashMap.end(); ++it)
         {
@@ -50,6 +53,7 @@ public:
     }
 };
 
+//header declaration for Expression class
 class Expression
 {
 public:

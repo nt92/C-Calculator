@@ -75,21 +75,24 @@ void Expression::Tokenize(list<string>& tokens, const string& delimiter)
 {
     size_t size = sizeof(charSet) / sizeof(string);
     
+    //makes sure that each separating operator has a space in front of and behind to allow tokenization to happen based on a whitespace delimiter
     for(int i = 0; i < static_cast<int>(size); i++)
     {
         string s = charSet[i];
         ReplaceAll(inString, s, " " + s + " ");
     }
     
+    //removes trailing space
     size_t next_pos = 0;
     size_t init_pos = inString.find_first_not_of(delimiter, next_pos);
     
     while(next_pos != string::npos &&
           init_pos != string::npos)
     {
-        // Get next delimiter position
+        //gets next delimiter position
         next_pos = inString.find(delimiter, init_pos);
         
+        //gets token based on delimiter
         string token = inString.substr(init_pos, next_pos - init_pos);
         tokens.push_back(token);
         
@@ -97,6 +100,8 @@ void Expression::Tokenize(list<string>& tokens, const string& delimiter)
     }
     
     string firstToken = tokens.front();
+    
+    //checks if there is a unary minus operator
     if(firstToken == "-")
     {
         list<string>::iterator it = tokens.begin();
@@ -109,11 +114,14 @@ void Expression::Tokenize(list<string>& tokens, const string& delimiter)
         
         string nextToken = *(it);
         
+        //if token is a number, perform unary operator
         if(IsNumber(nextToken))
         {
             tokens.pop_front();
             tokens.front() = firstToken + nextToken;
         }
+        
+        //basic parenthesis check for the expression
         else if(nextToken == "(")
         {
             tokens.front() = firstToken + "1";
@@ -219,6 +227,7 @@ void Expression::Tokenize(list<string>& tokens, const string& delimiter)
     }
 }
 
+//Function that replaces a string with another based on what to change. used to add delimiting space in expressions to allow for a more variety of parsing
 void Expression::ReplaceAll(string& str, const string& from, const string& to)
 {
     size_t start_pos = 0;
@@ -235,12 +244,15 @@ bool Expression::Evaluate(const vector<string>& rpn, string& result)
     typedef vector<string>::const_iterator rpn_iter;
     stack<string> stack;
     
+    //iterate through the vector
     for(rpn_iter it = rpn.begin(); it != rpn.end(); it++)
     {
         string token = *it;
         
+        //variable operation
         if(IsVariable(token))
         {
+            //check if variable exists in hashmap, if not throw an error
             string temp = hash.get(token);
             if(temp != "NA")
             {
@@ -253,11 +265,13 @@ bool Expression::Evaluate(const vector<string>& rpn, string& result)
             }
         }
         
+        //if the token is a number, push onto stack for evaluation
         if(IsNumber(token))
         {
             stack.push(token);
         }
         
+        //if the token is an operator
         else if(IsOperator(token))
         {
             double result = 0.0;
@@ -293,22 +307,28 @@ bool Expression::Evaluate(const vector<string>& rpn, string& result)
                 }
             }
             
+            //calculate value of expression
             if(IsOperator(token) && !isUnary)
             {
                 double d2 = args[0];
                 double d1 = args[1];
                 
+                //plus
                 if(token == "+")
                     result = d1 + d2;
                 
+                //minus
                 else if(token == "-")
                     result = d1 - d2;
                 
+                //multiply
                 else if(token == "*")
                     result = d1 * d2;
                 
+                //divide
                 else if(token == "/")
                 {
+                    //return error if divide by 0
                     if(d2 == 0)
                     {
                         cout << "Divide-By-Zero" << endl;
@@ -317,6 +337,7 @@ bool Expression::Evaluate(const vector<string>& rpn, string& result)
                     result = d1 / d2;
                 }
                 
+                //exponentiation
                 else if(token == "^")
                 {
                     double d2 = args[0];
@@ -325,9 +346,11 @@ bool Expression::Evaluate(const vector<string>& rpn, string& result)
                 }
             }
             
+            //catch for returning long in case of integer/long operations
             if(result ==(long)result)
                 result = long(result);
             
+            //push string value onto the stack
             stringstream s;
             s << result;
             stack.push(s.str());
@@ -356,21 +379,26 @@ bool Expression::InfixToRPN(vector<string>& inputs)
     list<string> infix;
     Tokenize(infix, " ");
     
+    //declare stack, queue, and iterator for token list
     typedef list<string>::const_iterator tok_iter;
     stack<string> stack;
     queue<string> outputQueue;
     
     bool success = true;
     
+    //iterates through infix list
     for(tok_iter it = infix.begin(); it != infix.end(); it++)
     {
         string token = *it;
         
+        //if the token is a number or a variable push it onto the queue
         if(IsNumber(token) || IsVariable(token))
             outputQueue.push(token);
         
         else if(IsOperator(token))
         {
+            //if the token is an operator, push it onto the stack provided the stack is not empty
+            //while there is an operator2 at the top of the stack and either the first operator1 is left-associative and its precedence <= operator 2 or operator1 is not left-associative and has precedence < operator 2, pop operator2 off the stack and onto the output queue
             while(!stack.empty() && IsOperator(stack.top()) &&
                   ((LeftAssociative(token) && OperatorPrecedence(token) == OperatorPrecedence(stack.top())) ||
                    (OperatorPrecedence(token) < OperatorPrecedence(stack.top()))))
@@ -382,9 +410,12 @@ bool Expression::InfixToRPN(vector<string>& inputs)
             stack.push(token);
             
         }
+        
+        //if token is a left parenthesis, pus it onto the stack
         else if(token == "(")
             stack.push(token);
         
+        //if the token is a right parenthesis, until the token at the top is left, pop operators off the stack onto the output queue. also pop the left parenthesis from the stack but not onto the output queue. if the token at the top of the stack is an operator, pop onto the output queue
         else if(token == ")")
         {
             while(!stack.empty() && stack.top() != "(")
@@ -397,6 +428,8 @@ bool Expression::InfixToRPN(vector<string>& inputs)
             {
                 string stackToken = stack.top();
                 
+                
+                //if parenthesis mismatched, return a value of false stating that the expression is invalid
                 if(stackToken != "(")
                     success = false;
             }
@@ -407,12 +440,15 @@ bool Expression::InfixToRPN(vector<string>& inputs)
         }
     }
     
+    
+    //while still operator tokens in stack, pop onto the output queue
     while(!stack.empty())
     {
         outputQueue.push(stack.top());
         stack.pop();
     }
     
+    //move all the values from the output queue onto the inputs list
     while(!outputQueue.empty())
     {
         string token = outputQueue.front();
