@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     while(s != "quit")
     {
         getline(cin, s);
-        s = trim(s);
+        s.erase(std::remove(s.begin(), s.end(), ' '), s.end());
         
         parser.inString = s;
         
@@ -41,31 +41,31 @@ int main(int argc, char** argv)
         //variable declaration
         if(s.substr(0,3) == "let")
         {
+            size_t eqPos = s.find("=");
+            string key = s.substr(3, eqPos - 3);
+            parser.inString = s.substr(eqPos+1);
+            
             //calculates value after = to add to variable
             parser.InfixToRPN(postfix);
             
-            vector<string> postfixEval;
-            
             //adds tokens of function to eval vector
-            for(int i = 2; i < postfix.size(); i++)
-                postfixEval.push_back(postfix[i]);
             
             string str_result;
-            parser.Evaluate(postfixEval, str_result);
+            parser.Evaluate(postfix, str_result);
             double result = string_to_double(str_result);
             
             //add the variable and its value to the hashmap
-            parser.hash.put(postfix[0], result);
+            parser.hash.put(key, result);
         }
         
         //expression calculation
         else if (parser.InfixToRPN(postfix))
         {
-//            for(int i = 0; i < (int)postfix.size(); i++)
-//            {
-//                cout << postfix[i] << " ";
-//            }
-//            
+            for(int i = 0; i < (int)postfix.size(); i++)
+            {
+                cout << postfix[i] << " ";
+            }
+            
             string str_result;
             
             //if possible to evaluate, will evaluate. otherwise throws an error from evaluate function

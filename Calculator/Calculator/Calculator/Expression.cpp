@@ -44,7 +44,7 @@ bool LeftAssociative(const string& s)
 bool IsOperator(const string& s)
 {
     //returns true if the token is one of these operators
-    return s == "+" || s == "-" || s == "/" || s == "*" || s == "^";
+    return s == "+" || s == "-" || s == "/" || s == "*" || s == "^" || s == "=";
 }
 
 bool IsNumber(const string& s)
@@ -73,169 +73,27 @@ bool IsVariable(const string& s)
 
 void Expression::Tokenize(list<string>& tokens, const string& delimiter)
 {
-    size_t size = sizeof(charSet) / sizeof(string);
-    
-    //makes sure that each separating operator has a space in front of and behind to allow tokenization to happen based on a whitespace delimiter
-    for(int i = 0; i < static_cast<int>(size); i++)
+    for(int i = 0; i < inString.size(); i++)
     {
-        string s = charSet[i];
-        ReplaceAll(inString, s, " " + s + " ");
-    }
-    
-    //removes trailing space
-    size_t next_pos = 0;
-    size_t init_pos = inString.find_first_not_of(delimiter, next_pos);
-    
-    while(next_pos != string::npos &&
-          init_pos != string::npos)
-    {
-        //gets next delimiter position
-        next_pos = inString.find(delimiter, init_pos);
+        string temp = inString.substr(i, 1);
+        string token = "";
         
-        //gets token based on delimiter
-        string token = inString.substr(init_pos, next_pos - init_pos);
+        if(IsOperator(temp) || temp == "(" || temp == ")")
+        {
+            token = temp;
+        }
+        
+        else
+        {
+            while(!IsOperator(inString.substr(i, 1)) && i < inString.size() && inString.substr(i, 1) != "(" && inString.substr(i, 1) != ")")
+            {
+                token += inString.substr(i, 1);
+                i++;
+            }
+            i--;
+        }
+        
         tokens.push_back(token);
-        
-        init_pos = inString.find_first_not_of(delimiter, next_pos);
-    }
-    
-    string firstToken = tokens.front();
-    
-    //checks if there is a unary minus operator
-    if(firstToken == "-")
-    {
-        list<string>::iterator it = tokens.begin();
-        it++;
-        
-        if(it == tokens.end())
-        {
-            return;
-        }
-        
-        string nextToken = *(it);
-        
-        //if token is a number, perform unary operator
-        if(IsNumber(nextToken))
-        {
-            tokens.pop_front();
-            tokens.front() = firstToken + nextToken;
-        }
-        
-        //basic parenthesis check for the expression
-        else if(nextToken == "(")
-        {
-            tokens.front() = firstToken + "1";
-            tokens.insert(it, "*");
-        }
-        
-        else if(nextToken == "-" && firstToken == "-")
-        {
-            list<string>::iterator nit = it;
-            advance(nit, -1);
-            tokens.erase(it);
-            tokens.erase(nit);
-        }
-    }
-    
-    typedef list<string>::iterator t_iter;
-    string prevToken = "";
-    for(t_iter it = tokens.begin(); it != prev(tokens.end()); it++)
-    {
-        string token = *it;
-        
-        list<string>::iterator nit = it;
-        advance(nit, 1);
-        
-        if(nit == tokens.end())
-            break;
-        
-        string ntoken = *nit;
-        
-        if(token == "-" && prevToken == "(")
-        {
-            if(IsNumber(ntoken))
-            {
-                tokens.erase(nit);
-                *it = "-" + ntoken;
-                token = *it;
-            }
-        }
-        
-        else if(token == "-" && (IsOperator(prevToken) || prevToken == "^"))
-        {
-            if(token == "-" && prevToken == "-")
-            {
-                list<string>::iterator nit = it;
-                list<string>::iterator nnit = nit;
-                nnit++;
-                advance(nit, -1);
-                tokens.erase(it);
-                *nit = "+";
-                
-                list<string>::iterator pnit = nit;
-                advance(pnit, -1);
-                
-                if(IsOperator(*pnit) || *pnit == "(")
-                    tokens.erase(nit);
-                
-                token = *nnit;
-                it = nnit;
-                
-                if(it == prev(tokens.end()))
-                    break;
-                
-            }
-            else if(IsNumber(ntoken))
-            {
-                bool exit = false;
-                if(nit == prev(tokens.end()))
-                    exit = true;
-                
-                tokens.erase(nit);
-                *it = "-" + ntoken;
-                token = *it;
-                
-                if(exit)
-                    break;
-            }
-            else if(ntoken == "(")
-            {
-                *it = "-1";
-                token = *it;
-                tokens.insert(nit, "*");
-            }
-        }
-        
-        prevToken = token;
-    }
-    
-    prevToken = "";
-    t_iter prevIt;
-    
-    for(t_iter it = tokens.begin(); it != tokens.end(); it++)
-    {
-        string token = *it;
-        
-        if(token == "(" && prevToken == "-")
-        {
-            tokens.insert(it, "1");
-            tokens.insert(it, "*");
-        }
-        
-        prevToken = token;
-        prevIt = it;
-    }
-}
-
-//Function that replaces a string with another based on what to change. used to add delimiting space in expressions to allow for a more variety of parsing
-void Expression::ReplaceAll(string& str, const string& from, const string& to)
-{
-    size_t start_pos = 0;
-    
-    while((start_pos = str.find(from, start_pos)) != string::npos)
-    {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length();
     }
 }
 
