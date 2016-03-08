@@ -12,7 +12,6 @@ double string_to_double(const string& s)
     return x;
 }
 
-//Function to trim the string input and remove any leading or trailing spaces
 string trim(string& str)
 {
     //returns a string that is a substring of the first character without a space to the end of the string lacking spaces
@@ -31,6 +30,13 @@ int main(int argc, char** argv)
     while(s != "quit")
     {
         getline(cin, s);
+        s = trim(s);
+        bool flag = false;
+        if (s.size() > 3)
+        {
+            flag = s.substr(3,1) == " ";
+        }
+        
         s.erase(std::remove(s.begin(), s.end(), ' '), s.end());
         
         parser.inString = s;
@@ -39,7 +45,7 @@ int main(int argc, char** argv)
         vector<string> postfix;
         
         //variable declaration
-        if(s.substr(0,3) == "let")
+        if(s.substr(0,3) == "let" && flag)
         {
             size_t eqPos = s.find("=");
             string key = s.substr(3, eqPos - 3);
@@ -61,10 +67,10 @@ int main(int argc, char** argv)
         //expression calculation
         else if (parser.InfixToRPN(postfix))
         {
-            for(int i = 0; i < (int)postfix.size(); i++)
-            {
-                cout << postfix[i] << " ";
-            }
+            //            for(int i = 0; i < (int)postfix.size(); i++)
+            //            {
+            //                cout << postfix[i] << " ";
+            //            }
             
             string str_result;
             
